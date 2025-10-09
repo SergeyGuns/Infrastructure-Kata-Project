@@ -4,9 +4,9 @@ import authService from "../services/authService";
 import { useNavigate, Link } from "react-router-dom";
 
 const Register = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("ya@ya.ru");
+  const [password, setPassword] = useState("password");
+  const [username, setUsername] = useState("Sergey");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { setError: setAppError, setUser } = useAppContext();

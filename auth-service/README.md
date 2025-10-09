@@ -55,4 +55,6 @@ The service uses:
 
 ## Docker
 
+`docker-compose -f docker-compose.dev.yml build`
+
 The service is containerized and can be run with Docker Compose as part of the infrastructure kata project.

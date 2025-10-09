@@ -29,7 +29,7 @@ services:
   auth:
     build:
       context: ./auth-service
-      target: builder
+      dockerfile: Dockerfile.dev
     volumes:
       - ./auth-service:/app
       - /app/node_modules

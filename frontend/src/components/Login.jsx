@@ -4,8 +4,8 @@ import authService from "../services/authService";
 import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("ya@ya.ru");
+  const [password, setPassword] = useState("password");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { setError: setAppError, setUser } = useAppContext();

@@ -1,5 +1,5 @@
 # Infrastructure Kata Project - QWEN.md
-
+NOT USE CODE COMMENTS BLOCK
 ## Project Overview
 
 This is an infrastructure kata project that demonstrates a complete infrastructure setup for a modern web application. The architecture follows a microservices pattern with three main services connected through Docker and NGINX for load balancing and static asset serving.
