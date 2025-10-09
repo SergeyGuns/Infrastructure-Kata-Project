@@ -1,0 +1,42 @@
+version: '3.8'
+services:
+  frontend:
+    image: ghcr.io/your-repo/frontend:prod
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  backend:
+    image: ghcr.io/your-repo/backend:prod
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=postgres
+    deploy:
+      replicas: 2
+
+  auth:
+    image: ghcr.io/your-repo/auth:prod
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+
+  postgres:
+    image: postgres:15
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+      - ./postgres/backups:/backups
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/prod.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  postgres_prod_data:

@@ -1,0 +1,130 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: |
+        cd backend && npm ci && cd ..
+        cd auth-service && npm ci && cd ..
+        
+    - name: Run linting
+      run: |
+        cd backend && npm run lint && cd ..
+        cd auth-service && npm run lint && cd ..
+        
+    - name: Run tests
+      run: |
+        cd backend && npm run test && cd ..
+        cd auth-service && npm run test && cd ..
+        
+    - name: Build Docker images
+      run: |
+        docker-compose -f docker-compose.test.yml build
+        
+    - name: Run integration tests
+      run: |
+        docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from tests
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Build and push frontend
+      uses: docker/build-push-action@v5
+      with:
+        context: ./frontend
+        push: true
+        tags: ghcr.io/${{ github.repository }}/frontend:latest,ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    - name: Build and push backend
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend
+        push: true
+        tags: ghcr.io/${{ github.repository }}/backend:latest,ghcr.io/${{ github.repository }}/backend:${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    - name: Build and push auth-service
+      uses: docker/build-push-action@v5
+      with:
+        context: ./auth-service
+        push: true
+        tags: ghcr.io/${{ github.repository }}/auth:latest,ghcr.io/${{ github.repository }}/auth:${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to production
+      env:
+        SERVER_HOST: ${{ secrets.SERVER_HOST }}
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      run: |
+        # Create deployment script
+        cat > deploy.sh << 'EOF'
+        #!/bin/bash
+        set -e
+        
+        # Stop existing containers
+        docker-compose -f docker-compose.prod.yml down || true
+        
+        # Pull latest images
+        docker-compose -f docker-compose.prod.yml pull
+        
+        # Start services
+        docker-compose -f docker-compose.prod.yml up -d
+        
+        # Wait for services to be healthy
+        sleep 30
+        
+        # Check if services are running properly
+        if docker-compose -f docker-compose.prod.yml ps | grep -q "Up"; then
+          echo "Deployment successful!"
+        else
+          echo "Deployment failed!"
+          exit 1
+        fi
+        EOF
+        
+        # Make deploy script executable
+        chmod +x deploy.sh
