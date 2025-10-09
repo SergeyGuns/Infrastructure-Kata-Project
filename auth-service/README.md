@@ -50,7 +50,7 @@ The service uses:
 - TypeORM for database operations
 - PostgreSQL database (or SQLite for tests)
 - JWT for authentication
-- Bcrypt for password hashing
+- Node.js crypto module for password hashing
 - Class-validator and class-transformer for validation and transformation
 
 ## Docker

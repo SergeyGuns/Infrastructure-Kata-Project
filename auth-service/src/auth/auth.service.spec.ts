@@ -6,7 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { RegisterDto, LoginDto } from './auth.dto';
-import * as bcrypt from 'bcrypt';
+import { hashPassword } from './password.util';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -86,7 +86,7 @@ describe('AuthService', () => {
       user.id = '1';
       user.email = loginDto.email;
       user.username = 'testuser';
-      user.password = await bcrypt.hash(loginDto.password, 10);
+      user.password = await hashPassword(loginDto.password);
 
       jest.spyOn(repository, 'findOne').mockResolvedValue(user);
 
@@ -116,7 +116,7 @@ describe('AuthService', () => {
       user.id = '1';
       user.email = loginDto.email;
       user.username = 'testuser';
-      user.password = await bcrypt.hash('different_password', 10);
+      user.password = await hashPassword('different_password');
 
       jest.spyOn(repository, 'findOne').mockResolvedValue(user);
 
