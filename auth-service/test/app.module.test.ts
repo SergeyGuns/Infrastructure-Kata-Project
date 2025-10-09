@@ -1,36 +1,33 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './auth/jwt.strategy';
-import { AuthService } from './auth/auth.service';
-import { AuthController } from './auth/auth.controller';
-import { User } from './user.entity';
+import { AppController } from '../src/app.controller';
+import { AppService } from '../src/app.service';
+import { AuthService } from '../src/auth/auth.service';
+import { AuthController } from '../src/auth/auth.controller';
+import { JwtStrategy } from '../src/auth/jwt.strategy';
+import { User } from '../src/user.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '../.env.test', // Use test environment file if available, otherwise will use defaults
     }),
     TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT) || 5432,
-      username: process.env.DB_USER || 'dev',
-      password: process.env.DB_PASSWORD || 'dev',
-      database: process.env.DB_NAME || 'dev_db',
-      autoLoadEntities: true,
-      synchronize: false, // Don't use synchronize in production
+      type: 'sqlite',  // Use SQLite for testing
+      database: ':memory:',  // In-memory database
+      synchronize: true,  // Automatically create tables
+      logging: false,
       entities: [User],
     }),
     TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET'),
+        secret: configService.get('JWT_SECRET') || 'dev_secret', // Use same fallback as JwtStrategy
         signOptions: { expiresIn: '1h' },
       }),
       inject: [ConfigService],
@@ -40,4 +37,4 @@ import { User } from './user.entity';
   controllers: [AppController, AuthController],
   providers: [AppService, AuthService, JwtStrategy],
 })
-export class AppModule {}
+export class TestAppModule {}

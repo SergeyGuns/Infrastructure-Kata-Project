@@ -27,7 +27,9 @@ services:
     command: npx @nestjs/cli start --watch
 
   auth:
-    build: ./auth-service
+    build:
+      context: ./auth-service
+      target: builder
     volumes:
       - ./auth-service:/app
       - /app/node_modules

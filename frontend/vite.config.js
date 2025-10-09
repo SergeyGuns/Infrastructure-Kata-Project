@@ -27,8 +27,12 @@ export default defineConfig({
     })
   ],
   server: {
+    watch: {
+      usePolling: true,
+    },
+    strictPort: true,
     port: 3000,
-    open: true
+    open: false
   },
   build: {
     outDir: 'dist'

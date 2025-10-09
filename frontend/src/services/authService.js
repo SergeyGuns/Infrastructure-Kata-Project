@@ -1,10 +1,11 @@
-import axios from 'axios';
+import { apiClient, authApiClient } from './api';
 
 const authService = {
   // Check auth status
   getStatus: async () => {
     try {
-      const response = await axios.get('/auth/api/auth/status');
+      // Use apiClient to include auth token if available
+      const response = await apiClient.get('/auth/status');
       return response.data;
     } catch (error) {
       console.error('Error checking auth status:', error);
@@ -15,10 +16,23 @@ const authService = {
   // Login
   login: async (credentials) => {
     try {
-      const response = await axios.post('/auth/api/auth/login', credentials);
+      // Use authApiClient since auth requests shouldn't include auth token
+      const response = await authApiClient.post('/auth/login', credentials);
       return response.data;
     } catch (error) {
       console.error('Login error:', error);
+      throw error;
+    }
+  },
+
+  // Register
+  register: async (userData) => {
+    try {
+      // Use authApiClient since auth requests shouldn't include auth token
+      const response = await authApiClient.post('/auth/register', userData);
+      return response.data;
+    } catch (error) {
+      console.error('Registration error:', error);
       throw error;
     }
   },

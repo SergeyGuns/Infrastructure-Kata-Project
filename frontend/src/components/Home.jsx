@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react'
 import { useAppContext } from '../context/AppContext'
-import apiClient from '../services/api'
+import { apiClient } from '../services/api'
 import authService from '../services/authService'
 
 const Home = () => {
-  const { backendData, authStatus, setBackendData, setAuthStatus, setLoading, setError } = useAppContext()
+  const { backendData, authStatus, user, setBackendData, setAuthStatus, setLoading, setError, setUser } = useAppContext()
 
   useEffect(() => {
     setLoading(true);
@@ -23,6 +23,10 @@ const Home = () => {
     authService.getStatus()
       .then(data => {
         setAuthStatus(data);
+        // Update user in context if token exists
+        if (localStorage.getItem('token')) {
+          setUser(authService.getCurrentUser());
+        }
       })
       .catch(err => {
         console.error('Error checking auth status:', err);
@@ -31,7 +35,7 @@ const Home = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [setBackendData, setAuthStatus, setLoading, setError])
+  }, [])
 
   return (
     <div className="container">
@@ -54,6 +58,13 @@ const Home = () => {
             <h3>Auth Status</h3>
             <p>{authStatus ? JSON.stringify(authStatus) : 'Loading...'}</p>
           </div>
+
+          {user && (
+            <div className="card">
+              <h3>User Info</h3>
+              <p>Welcome, {user.name}!</p>
+            </div>
+          )}
         </div>
       </main>
 
