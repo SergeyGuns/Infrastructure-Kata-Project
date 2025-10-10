@@ -1,5 +1,7 @@
 import { DataSource } from "typeorm";
 import { resolve } from "path";
+import { Migration002AddNameToUsers } from "./migrations/002MigrationAddNameToUsers";
+import { Migration001InitialSchema } from "./migrations/001MigrationInitialSchema";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -10,7 +12,5 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME || "kata_db",
   synchronize: false,
   logging: true,
-  entities: [resolve(__dirname, "./entities/**/*{.ts,.js}")],
-  migrations: [resolve(__dirname, "./migrations/**/*{.ts,.js}")],
-  subscribers: [resolve(__dirname, "./subscribers/**/*{.ts,.js}")],
+  migrations: [ Migration001InitialSchema, Migration002AddNameToUsers],
 });

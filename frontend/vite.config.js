@@ -31,7 +31,7 @@ export default defineConfig({
       usePolling: true,
     },
     strictPort: true,
-    port: 3000,
+    port: 8080,
     open: false
   },
   build: {

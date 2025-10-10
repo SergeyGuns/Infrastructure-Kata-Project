@@ -3,9 +3,20 @@ import { Link, useLocation } from 'react-router-dom'
 import { useAppContext } from '../../context/AppContext'
 
 const Layout = ({ children }) => {
-  const { user, logout } = useAppContext();
+  const { user, logout, getHealth } = useAppContext();
+  const [authHealth, setAuthHealth] = React.useState<boolean>(false);
   const location = useLocation();
-
+  React.useEffect(() => {
+    const fetchAuthHealth = async () => {
+      try {
+        const health = await getHealth();
+        health ?? setAuthHealth(true);
+      } catch (error) {
+        setAuthHealth(false);
+      }
+    };
+    fetchAuthHealth();
+  }, [getHealth]);
   const handleLogout = () => {
     logout();
   };
@@ -49,6 +60,9 @@ const Layout = ({ children }) => {
       </main>
       <footer className="footer">
         <p>© {new Date().getFullYear()} Infrastructure Kata. All rights reserved.</p>
+        <ul>
+          <li>{authHealth ? <span style={{ color: 'green' }}>Auth service is healthy</span> : <span style={{ color: 'red' }}>Auth service is down</span>}</li>
+        </ul>
       </footer>
     </div>
   )

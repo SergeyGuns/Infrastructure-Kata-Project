@@ -1,14 +1,14 @@
 import { apiClient, authApiClient } from './api';
 
 const authService = {
-  // Check auth status
-  getStatus: async () => {
+  // Check auth health
+  getHealth: async () => {
     try {
       // Use apiClient to include auth token if available
-      const response = await apiClient.get('/auth/status');
+      const response = await apiClient.get('/auth/health');
       return response.data;
     } catch (error) {
-      console.error('Error checking auth status:', error);
+      console.error('Error checking auth health:', error);
       throw error;
     }
   },
