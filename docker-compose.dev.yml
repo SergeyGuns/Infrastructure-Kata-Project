@@ -24,6 +24,7 @@ services:
       - DB_NAME=dev_db
     depends_on:
       - postgres
+      - migration
     command: npx @nestjs/cli start --watch
 
   auth:
@@ -39,13 +40,13 @@ services:
       - DB_PORT=5432
     depends_on:
       - postgres
+      - migration
     command: npx @nestjs/cli start --watch
 
   postgres:
     image: postgres:15
     volumes:
       - postgres_dev_data:/var/lib/postgresql/data
-      - ./postgres/migrations:/docker-entrypoint-initdb.d
     environment:
       - POSTGRES_USER=dev
       - POSTGRES_PASSWORD=dev
@@ -64,6 +65,8 @@ services:
         condition: service_started
       frontend:
         condition: service_started
+      migration:
+        condition: service_completed_successfully
 
 volumes:
   postgres_dev_data:

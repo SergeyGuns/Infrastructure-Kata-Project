@@ -22,6 +22,7 @@ services:
       - DB_NAME=test_db
     depends_on:
       - postgres
+      - migration
     command: npm run start:dev
 
   auth:
@@ -31,13 +32,25 @@ services:
       - DB_HOST=postgres
     depends_on:
       - postgres
+      - migration
     command: npm run start:dev
+
+  migration:
+    build: ./migration-service
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=test
+      - DB_PASSWORD=test
+      - DB_NAME=test_db
+    depends_on:
+      - postgres
+    command: npm run migration:run
 
   postgres:
     image: postgres:15
     volumes:
       - postgres_test_data:/var/lib/postgresql/data
-      - ./postgres/migrations:/docker-entrypoint-initdb.d
     environment:
       - POSTGRES_USER=test
       - POSTGRES_PASSWORD=test
@@ -58,6 +71,7 @@ services:
     depends_on:
       - backend
       - auth
+      - migration
 
 volumes:
   postgres_test_data:

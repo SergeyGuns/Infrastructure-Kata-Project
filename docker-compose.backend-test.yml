@@ -14,14 +14,27 @@ services:
       - NODE_ENV=test
     depends_on:
       - postgres-test
+      - migration
     command: npm run test
+
+  migration:
+    build: ./migration-service
+    environment:
+      - DB_HOST=postgres-test
+      - DB_PORT=5432
+      - DB_USERNAME=test
+      - DB_PASSWORD=test
+      - DB_NAME=test_db
+    depends_on:
+      - postgres-test
+    command: npm run migration:run
 
   postgres-test:
     image: postgres:15
     environment:
       - POSTGRES_USER=test
       - POSTGRES_PASSWORD=test
-      - POSTGRES_DB=test_db
+      - DB_NAME=test_db
     volumes:
       - postgres_test_data:/var/lib/postgresql/data
 
