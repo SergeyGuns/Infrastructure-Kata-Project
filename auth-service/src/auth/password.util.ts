@@ -16,3 +16,14 @@ export async function verifyPassword(
   // Compare the newly created hash with the stored hash
   return hash === storedHash;
 }
+
+export function hashPassword(password: string): string {
+  // Generate a random salt
+  const salt = crypto.randomBytes(16).toString('hex');
+  
+  // Create a hash using the password and the salt
+  const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+  
+  // Return the salt and hash concatenated with a colon
+  return `${salt}:${hash}`;
+}
