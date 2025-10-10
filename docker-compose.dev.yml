@@ -52,6 +52,20 @@ services:
       - POSTGRES_PASSWORD=dev
       - POSTGRES_DB=dev_db
 
+  migration-service:
+    build: ./migration-service
+    container_name: migration-service
+    depends_on:
+      - postgres
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=kata_db
+    networks:
+      - app-network
+
   nginx:
     image: nginx:latest
     ports:
