@@ -9,6 +9,7 @@ import { JwtStrategy } from './auth/jwt.strategy';
 import { AuthService } from './auth/auth.service';
 import { AuthController } from './auth/auth.controller';
 import { User } from './user.entity';
+import { RsaService } from './auth/rsa.service';
 
 @Module({
   imports: [
@@ -29,15 +30,24 @@ import { User } from './user.entity';
     TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET'),
-        signOptions: { expiresIn: '1h' },
-      }),
-      inject: [ConfigService],
+      useFactory: async (configService: ConfigService, rsaService: RsaService) => {
+        // Wait for RSA service to initialize
+        await rsaService.onModuleInit();
+        
+        return {
+          secretOrKey: rsaService.getPublicKey(), // Provide the public key for verification
+          signOptions: { 
+            expiresIn: '1h',
+            algorithm: 'RS256' // Use RS256 algorithm for verification
+          },
+        };
+      },
+      inject: [ConfigService, RsaService],
     }),
     PassportModule,
   ],
   controllers: [AppController, AuthController],
-  providers: [AppService, AuthService, JwtStrategy],
+  providers: [AppService, AuthService, JwtStrategy, RsaService],
+  exports: [RsaService],
 })
 export class AppModule {}

@@ -16,7 +16,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get('JWT_SECRET') || 'dev_secret', // Fallback to dev secret
+      algorithms: ['RS256'], // Specify the algorithm to use (RSA signing)
+      // The secretOrKey will be provided by the JwtModule configuration
     });
   }
 

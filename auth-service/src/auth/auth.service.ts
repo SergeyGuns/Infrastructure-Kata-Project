@@ -3,24 +3,25 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../user.entity';
 import { RegisterDto, LoginDto } from './auth.dto';
-import { JwtService } from '@nestjs/jwt';
+import { RsaService } from './rsa.service';
+import { signRSA } from './jwt.util';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    private jwtService: JwtService,
+    private rsaService: RsaService,
   ) {}
 
   async register(registerDto: RegisterDto): Promise<{ access_token: string }> {
     // Check if user already exists
     const existingUser = await this.usersRepository.findOne({
-      where: [{ email: registerDto.email }, { username: registerDto.username }],
+      where: [{ email: registerDto.email }],
     });
 
     if (existingUser) {
-      throw new ConflictException('User with this email or username already exists');
+      throw new ConflictException('User with this email already exists');
     }
 
     // Create new user
@@ -33,9 +34,9 @@ export class AuthService {
     
     const savedUser = await this.usersRepository.save(user);
 
-    // Generate JWT token
+    // Generate JWT token with RSA signature
     const payload = { sub: savedUser.id, email: savedUser.email, username: savedUser.username };
-    const access_token = this.jwtService.sign(payload);
+    const access_token = signRSA(payload, this.rsaService.getPrivateKey(), { expiresIn: '1h' });
 
     return { access_token };
   }
@@ -56,9 +57,9 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    // Generate JWT token
+    // Generate JWT token with RSA signature
     const payload = { sub: user.id, email: user.email, username: user.username };
-    const access_token = this.jwtService.sign(payload);
+    const access_token = signRSA(payload, this.rsaService.getPrivateKey(), { expiresIn: '1h' });
 
     return { access_token };
   }

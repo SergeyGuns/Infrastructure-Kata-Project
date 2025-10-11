@@ -2,16 +2,16 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { Repository } from 'typeorm';
 import { User } from '../user.entity';
-import { JwtService } from '@nestjs/jwt';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { RegisterDto, LoginDto } from './auth.dto';
 import { hashPassword } from './password.util';
+import { RsaService } from './rsa.service';
 
 describe('AuthService', () => {
   let service: AuthService;
   let repository: Repository<User>;
-  let jwtService: JwtService;
+  let rsaService: RsaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -22,9 +22,11 @@ describe('AuthService', () => {
           useClass: Repository,
         },
         {
-          provide: JwtService,
+          provide: RsaService,
           useValue: {
-            sign: jest.fn(() => 'mocked_jwt_token'),
+            getPrivateKey: jest.fn(() => 'mock_private_key'),
+            getPublicKey: jest.fn(() => 'mock_public_key'),
+            onModuleInit: jest.fn(),
           },
         },
       ],
@@ -32,7 +34,7 @@ describe('AuthService', () => {
 
     service = module.get<AuthService>(AuthService);
     repository = module.get<Repository<User>>(getRepositoryToken(User));
-    jwtService = module.get<JwtService>(JwtService);
+    rsaService = module.get<RsaService>(RsaService);
   });
 
   it('should be defined', () => {
@@ -57,9 +59,13 @@ describe('AuthService', () => {
         updatedAt: new Date(),
       } as User);
 
+      // Mock the signRSA function since we can't import it directly in the test
+      const originalSignRSA = jest.requireActual('./jwt.util').signRSA;
+      jest.spyOn(require('./jwt.util'), 'signRSA').mockReturnValue('mocked_rsa_token');
+
       const result = await service.register(registerDto);
 
-      expect(result).toEqual({ access_token: 'mocked_jwt_token' });
+      expect(result).toEqual({ access_token: 'mocked_rsa_token' });
     });
 
     it('should throw ConflictException if user already exists', async () => {
@@ -90,9 +96,13 @@ describe('AuthService', () => {
 
       jest.spyOn(repository, 'findOne').mockResolvedValue(user);
 
+      // Mock the signRSA function since we can't import it directly in the test
+      const originalSignRSA = jest.requireActual('./jwt.util').signRSA;
+      jest.spyOn(require('./jwt.util'), 'signRSA').mockReturnValue('mocked_rsa_token');
+
       const result = await service.login(loginDto);
 
-      expect(result).toEqual({ access_token: 'mocked_jwt_token' });
+      expect(result).toEqual({ access_token: 'mocked_rsa_token' });
     });
 
     it('should throw UnauthorizedException if user does not exist', async () => {
