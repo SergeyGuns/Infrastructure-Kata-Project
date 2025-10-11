@@ -4,7 +4,7 @@ import { useAppContext } from '../../context/AppContext'
 
 const Layout = ({ children }) => {
   const { user, logout, getHealth } = useAppContext();
-  const [authHealth, setAuthHealth] = React.useState<boolean>(false);
+  const [authHealth, setAuthHealth] = React.useState(false);
   const location = useLocation();
   React.useEffect(() => {
     const fetchAuthHealth = async () => {

@@ -19,8 +19,8 @@ const Home = () => {
         setError(err.message);
       });
 
-    // Check auth status
-    authService.getStatus()
+    // Check auth health
+    authService.getHealth()
       .then(data => {
         setAuthStatus(data);
         // Update user in context if token exists
