@@ -24,6 +24,15 @@ services:
     depends_on:
       - migration
 
+  swagger:
+    image: ghcr.io/your-repo/swagger:prod
+    environment:
+      - PORT=3002
+    ports:
+      - "3002:3002"
+    deploy:
+      replicas: 1
+
   migration:
     build: ./migration-service
     environment:
@@ -53,6 +62,7 @@ services:
     depends_on:
       - frontend
       - backend
+      - swagger
       - migration
 
 volumes:
