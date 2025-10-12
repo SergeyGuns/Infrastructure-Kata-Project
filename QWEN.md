@@ -1,3 +1,4 @@
+ВСЕГДА ОТВЕЧАЙ НА РУССКОМ!!!
 # Infrastructure Kata Project - QWEN.md
 NOT USE CODE COMMENTS BLOCK
 ## Project Overview
@@ -85,6 +86,12 @@ k6 run k6/basic-test.js
 - Services communicate over Docker network using service names as hostnames
 - NGINX routes requests appropriately (API requests to backend, auth requests to auth service)
 - All services can access PostgreSQL using the hostname "postgres"
+
+### Authentication Service Security Features
+- Password hashing with salt using Node.js crypto module
+- Configurable password salt through environment variable (`PASSWORD_SALT`)
+- Default fallback salt value if environment variable is not set
+- Random salt generation per password for enhanced security
 
 ## Key Files
 

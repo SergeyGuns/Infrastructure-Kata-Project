@@ -1,8 +1,5 @@
 import * as crypto from 'crypto';
 
-
-
-
 export async function verifyPassword(
   password: string,
   hashedPassword: string,
@@ -25,5 +22,14 @@ export function hashPassword(password: string): string {
   const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
   
   // Return the salt and hash concatenated with a colon
+  return `${salt}:${hash}`;
+}
+
+// Alternative function that uses a provided salt
+export function hashPasswordWithSalt(password: string, salt: string): string {
+  // Create a hash using the password and the provided salt
+  const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+  
+  // Return the provided salt and hash concatenated with a colon
   return `${salt}:${hash}`;
 }

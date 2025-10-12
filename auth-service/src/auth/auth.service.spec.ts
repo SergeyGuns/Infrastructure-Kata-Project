@@ -5,13 +5,15 @@ import { User } from '../user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { RegisterDto, LoginDto } from './auth.dto';
-import { hashPassword } from './password.util';
 import { RsaService } from './rsa.service';
+import { PasswordService } from './password.service';
+import { ConfigService } from '@nestjs/config';
 
 describe('AuthService', () => {
   let service: AuthService;
   let repository: Repository<User>;
   let rsaService: RsaService;
+  let passwordService: PasswordService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,12 +31,31 @@ describe('AuthService', () => {
             onModuleInit: jest.fn(),
           },
         },
+        {
+          provide: PasswordService,
+          useValue: {
+            hashPassword: jest.fn((password) => `hashed_${password}`),
+            verifyPassword: jest.fn((plainPassword, hashedPassword) => plainPassword === 'correct_password' && hashedPassword === 'hashed_correct_password'),
+          },
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn((key: string) => {
+              if (key === 'PASSWORD_SALT') {
+                return process.env.PASSWORD_SALT || 'a-very-secure-salt-value-for-password-hashing';
+              }
+              return undefined;
+            }),
+          },
+        },
       ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
     repository = module.get<Repository<User>>(getRepositoryToken(User));
     rsaService = module.get<RsaService>(RsaService);
+    passwordService = module.get<PasswordService>(PasswordService);
   });
 
   it('should be defined', () => {
@@ -54,7 +75,7 @@ describe('AuthService', () => {
         id: '1',
         email: registerDto.email,
         username: registerDto.username,
-        password: 'hashed_password',
+        password: 'hashed_password123',
         createdAt: new Date(),
         updatedAt: new Date(),
       } as User);
@@ -62,10 +83,14 @@ describe('AuthService', () => {
       // Mock the signRSA function since we can't import it directly in the test
       const originalSignRSA = jest.requireActual('./jwt.util').signRSA;
       jest.spyOn(require('./jwt.util'), 'signRSA').mockReturnValue('mocked_rsa_token');
+      
+      // Mock the password service to return a predictable hash
+      jest.spyOn(passwordService, 'hashPassword').mockResolvedValue('hashed_password123');
 
       const result = await service.register(registerDto);
 
       expect(result).toEqual({ access_token: 'mocked_rsa_token' });
+      expect(passwordService.hashPassword).toHaveBeenCalledWith('password123');
     });
 
     it('should throw ConflictException if user already exists', async () => {
@@ -92,7 +117,10 @@ describe('AuthService', () => {
       user.id = '1';
       user.email = loginDto.email;
       user.username = 'testuser';
-      user.password = await hashPassword(loginDto.password);
+      user.password = 'hashed_password123';
+      
+      jest.spyOn(repository, 'findOne').mockResolvedValue(user);
+      jest.spyOn(passwordService, 'verifyPassword').mockResolvedValue(true);
 
       jest.spyOn(repository, 'findOne').mockResolvedValue(user);
 
@@ -126,7 +154,10 @@ describe('AuthService', () => {
       user.id = '1';
       user.email = loginDto.email;
       user.username = 'testuser';
-      user.password = await hashPassword('different_password');
+      user.password = 'hashed_different_password';
+      
+      jest.spyOn(repository, 'findOne').mockResolvedValue(user);
+      jest.spyOn(passwordService, 'verifyPassword').mockResolvedValue(false);
 
       jest.spyOn(repository, 'findOne').mockResolvedValue(user);
 

@@ -10,12 +10,14 @@ import { AuthService } from './auth/auth.service';
 import { AuthController } from './auth/auth.controller';
 import { User } from './user.entity';
 import { RsaService } from './auth/rsa.service';
+import { AuthConfigModule } from './auth/auth-config.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    AuthConfigModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
@@ -29,13 +31,14 @@ import { RsaService } from './auth/rsa.service';
     }),
     TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync({
-      imports: [ConfigModule],
+      imports: [AuthConfigModule],
       useFactory: async (configService: ConfigService, rsaService: RsaService) => {
         // Wait for RSA service to initialize
         await rsaService.onModuleInit();
         
         return {
           secretOrKey: rsaService.getPublicKey(), // Provide the public key for verification
+          algorithms: ['RS256'],
           signOptions: { 
             expiresIn: '1h',
             algorithm: 'RS256' // Use RS256 algorithm for verification
@@ -47,7 +50,7 @@ import { RsaService } from './auth/rsa.service';
     PassportModule,
   ],
   controllers: [AppController, AuthController],
-  providers: [AppService, AuthService, JwtStrategy, RsaService],
-  exports: [RsaService],
+  providers: [AppService, AuthService, JwtStrategy],
+  exports: [],
 })
 export class AppModule {}

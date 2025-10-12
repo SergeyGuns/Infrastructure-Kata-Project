@@ -9,6 +9,8 @@ import { AuthService } from '../src/auth/auth.service';
 import { AuthController } from '../src/auth/auth.controller';
 import { JwtStrategy } from '../src/auth/jwt.strategy';
 import { User } from '../src/user.entity';
+import { RsaService } from '../src/auth/rsa.service';
+import { AuthConfigModule } from '../src/auth/auth-config.module';
 
 @Module({
   imports: [
@@ -16,6 +18,7 @@ import { User } from '../src/user.entity';
       isGlobal: true,
       envFilePath: '../.env.test', // Use test environment file if available, otherwise will use defaults
     }),
+    AuthConfigModule,
     TypeOrmModule.forRoot({
       type: 'sqlite',  // Use SQLite for testing
       database: ':memory:',  // In-memory database
@@ -25,16 +28,25 @@ import { User } from '../src/user.entity';
     }),
     TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET') || 'dev_secret', // Use same fallback as JwtStrategy
-        signOptions: { expiresIn: '1h' },
-      }),
-      inject: [ConfigService],
+      imports: [AuthConfigModule],
+      useFactory: async (configService: ConfigService, rsaService: RsaService) => {
+        // Wait for RSA service to initialize
+        await rsaService.onModuleInit();
+        
+        return {
+          secretOrKey: rsaService.getPublicKey(), // Provide the public key for verification
+          algorithms: ['RS256'],
+          signOptions: { 
+            expiresIn: '1h',
+            algorithm: 'RS256' // Use RS256 algorithm for verification
+          },
+        };
+      },
+      inject: [ConfigService, RsaService],
     }),
     PassportModule,
   ],
   controllers: [AppController, AuthController],
-  providers: [AppService, AuthService, JwtStrategy],
+  providers: [AppService, AuthService, JwtStrategy, RsaService],
 })
 export class TestAppModule {}

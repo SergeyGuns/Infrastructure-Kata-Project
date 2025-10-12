@@ -5,6 +5,7 @@ import { User } from '../user.entity';
 import { RegisterDto, LoginDto } from './auth.dto';
 import { RsaService } from './rsa.service';
 import { signRSA } from './jwt.util';
+import { PasswordService } from './password.service';
 
 @Injectable()
 export class AuthService {
@@ -12,6 +13,7 @@ export class AuthService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private rsaService: RsaService,
+    private passwordService: PasswordService,
   ) {}
 
   async register(registerDto: RegisterDto): Promise<{ access_token: string }> {
@@ -24,13 +26,14 @@ export class AuthService {
       throw new ConflictException('User with this email already exists');
     }
 
+    // Hash the password before creating the user
+    const hashedPassword = await this.passwordService.hashPassword(registerDto.password);
+
     // Create new user
     const user = new User();
     user.email = registerDto.email;
     user.username = registerDto.username;
-    user.password = registerDto.password; // Will be hashed in the user entity
-
-    await user.hashPassword(); // Hash the password
+    user.password = hashedPassword;
     
     const savedUser = await this.usersRepository.save(user);
 
@@ -52,7 +55,7 @@ export class AuthService {
     }
 
     // Validate password
-    const isPasswordValid = await user.validatePassword(loginDto.password);
+    const isPasswordValid = await this.passwordService.verifyPassword(loginDto.password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid email or password');
     }

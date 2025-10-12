@@ -24,7 +24,7 @@ This is a NestJS-based authentication service that provides JWT-based user authe
 - `DB_USER` - Database username (default: dev)
 - `DB_PASSWORD` - Database password (default: dev)
 - `DB_NAME` - Database name (default: dev_db)
-- `JWT_SECRET` - Secret for JWT signing
+- `PASSWORD_SALT` - Salt for password hashing (default: a-very-secure-salt-value-for-password-hashing)
 
 ## Running the Service
 
@@ -50,6 +50,7 @@ The service uses:
 - TypeORM for database operations
 - PostgreSQL database (or SQLite for tests)
 - JWT for authentication
+- PasswordService for environment-based password salt management
 - Node.js crypto module for password hashing
 - Class-validator and class-transformer for validation and transformation
 
