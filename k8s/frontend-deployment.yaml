@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: ghcr.io/your-repo/frontend:latest
+        image: sergeyguns/frontend:latest
         ports:
         - containerPort: 80

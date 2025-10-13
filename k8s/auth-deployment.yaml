@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: auth
-        image: ghcr.io/your-repo/auth:latest
+        image: sergeyguns/auth-service:latest
         ports:
         - containerPort: 4001
         env:
