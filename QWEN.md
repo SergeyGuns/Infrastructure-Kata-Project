@@ -19,7 +19,7 @@ This is an infrastructure kata project that demonstrates a complete infrastructu
 ```
 project/
 ├── frontend/          # React
-├── backend/           # NestJS (microservice)
+├── backend-service/   # NestJS (microservice)
 ├── auth-service/      # Custom NestJS JWT auth server
 ├── nginx/             # Configurations for static assets and load balancing
 ├── postgres/          # SQL migrations, dumps, backup scripts

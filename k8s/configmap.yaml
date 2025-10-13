@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: infra-kata
+data:
+  node_env: "production"
+  db_port: "5432"
+  backend_port: "4000"
+  auth_port: "4001"
+  swagger_port: "3002"

@@ -8,8 +8,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies and NestJS CLI globally
-RUN npm install && \
-    npm ci && \
+RUN npm install --legacy-peer-deps && \
+    npm ci --legacy-peer-deps && \
     npm install -g @nestjs/cli && \
     ln -s /usr/local/bin/nest /usr/bin/nest
 
@@ -33,7 +33,7 @@ COPY package*.json ./
 COPY package-lock.json* ./
 
 # Install only production dependencies
-RUN npm ci --only=production
+RUN npm install --only=production --legacy-peer-deps
 
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
