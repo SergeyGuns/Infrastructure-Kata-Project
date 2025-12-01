@@ -98,6 +98,16 @@ jobs:
           fi
         done
 
+    - name: Rebuild packages to fix symlinks and permissions
+      run: |
+        for dir in ${PROJECTS[@]}; do
+          if [ -f "$dir/package.json" ]; then
+            echo "Rebuilding packages for $dir to fix symlinks"
+            # npm rebuild helps recreate symlinks in node_modules/.bin with correct permissions
+            npm rebuild --prefix "$dir" 2>/dev/null || echo "Rebuild failed for $dir, continuing..."
+          fi
+        done
+
     - name: Ensure executable permissions before running scripts
       run: |
         for dir in ${PROJECTS[@]}; do
