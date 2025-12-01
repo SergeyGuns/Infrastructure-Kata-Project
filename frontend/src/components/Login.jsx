@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import authService from "../services/authService";
 import { useNavigate, Link } from "react-router-dom";
@@ -91,7 +91,7 @@ const Login = () => {
           </button>
         </form>
         <div className="register-link">
-          <p>Don't have an account? <Link to="/register">Register here</Link></p>
+          <p>{"Don't"} have an account? <Link to="/register">Register here</Link></p>
         </div>
       </div>
     </div>

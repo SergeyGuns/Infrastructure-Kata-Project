@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useAppContext } from '../context/AppContext'
 import { apiClient } from '../services/api'
 import authService from '../services/authService'
@@ -8,7 +8,7 @@ const Home = () => {
 
   useEffect(() => {
     setLoading(true);
-    
+
     // Fetch data from backend service
     apiClient.get('/api/hello')
       .then(res => {
@@ -35,7 +35,7 @@ const Home = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [])
+  }, [setBackendData, setAuthStatus, setLoading, setError, setUser])
 
   return (
     <div className="container">

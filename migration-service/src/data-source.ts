@@ -1,5 +1,4 @@
 import { DataSource } from "typeorm";
-import { resolve } from "path";
 import { Migration002AddNameToUsers } from "./migrations/002MigrationAddNameToUsers";
 import { Migration001InitialSchema } from "./migrations/001MigrationInitialSchema";
 import { Migration003AddAdminUser } from "./migrations/003MigrationAddAdminUser";

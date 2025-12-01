@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useReducer } from 'react';
+import { createContext, useContext, useReducer } from 'react';
+import PropTypes from 'prop-types';
 
 // Initial state
 const initialState = {
@@ -97,6 +98,10 @@ export const AppProvider = ({ children }) => {
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+};
+
+AppProvider.propTypes = {
+  children: PropTypes.node.isRequired
 };
 
 // Custom hook to use the app context

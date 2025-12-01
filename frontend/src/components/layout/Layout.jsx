@@ -1,17 +1,18 @@
-import React from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAppContext } from '../../context/AppContext'
+import PropTypes from 'prop-types'
 
 const Layout = ({ children }) => {
   const { user, logout, getHealth } = useAppContext();
-  const [authHealth, setAuthHealth] = React.useState(false);
+  const [authHealth, setAuthHealth] = useState(false);
   const location = useLocation();
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchAuthHealth = async () => {
       try {
         const health = await getHealth();
         health ?? setAuthHealth(true);
-      } catch (error) {
+      } catch {
         setAuthHealth(false);
       }
     };
@@ -67,5 +68,9 @@ const Layout = ({ children }) => {
     </div>
   )
 }
+
+Layout.propTypes = {
+  children: PropTypes.node.isRequired
+};
 
 export default Layout

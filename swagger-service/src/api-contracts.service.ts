@@ -2,13 +2,47 @@ import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 
+// Define types for OpenAPI spec
+interface OpenApiRequestBody {
+  required?: boolean;
+  content?: Record<string, unknown>;
+  [key: string]: unknown; // Allow additional properties
+}
+
+interface OpenApiResponse {
+  description?: string;
+  content?: Record<string, unknown>;
+  [key: string]: unknown; // Allow additional properties
+}
+
+interface OpenApiPath {
+  [method: string]: {
+    summary?: string;
+    description?: string;
+    requestBody?: OpenApiRequestBody;
+    responses: Record<string, OpenApiResponse>;
+    [key: string]: unknown; // Allow additional properties
+  };
+}
+
+interface OpenApiSpec {
+  openapi: string;
+  info: {
+    title: string;
+    version: string;
+    description?: string;
+  };
+  paths: Record<string, OpenApiPath>;
+  [key: string]: unknown; // Allow additional properties
+}
+
 @Injectable()
 export class ApiContractsService {
   private readonly logger = new Logger(ApiContractsService.name);
   
   constructor(private httpService: HttpService) {}
 
-  async fetchBackendApiSpec(): Promise<any> {
+  async fetchBackendApiSpec(): Promise<OpenApiSpec> {
     try {
       // In our docker environment, the backend service runs on port 4000 internally
       // but might be accessible through the nginx proxy as well
@@ -52,7 +86,7 @@ export class ApiContractsService {
     }
   }
 
-  async fetchAuthApiSpec(): Promise<any> {
+  async fetchAuthApiSpec(): Promise<OpenApiSpec> {
     try {
       // In our docker environment, the auth service runs internally
       const response = await firstValueFrom(
@@ -152,7 +186,7 @@ export class ApiContractsService {
     }
   }
   
-  async fetchAllApiSpecs(): Promise<any> {
+  async fetchAllApiSpecs(): Promise<Record<string, OpenApiSpec>> {
     const [backendSpec, authSpec] = await Promise.allSettled([
       this.fetchBackendApiSpec(),
       this.fetchAuthApiSpec()

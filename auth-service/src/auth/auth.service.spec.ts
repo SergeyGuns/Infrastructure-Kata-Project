@@ -8,6 +8,7 @@ import { RegisterDto, LoginDto } from './auth.dto';
 import { RsaService } from './rsa.service';
 import { PasswordService } from './password.service';
 import { ConfigService } from '@nestjs/config';
+import * as jwtUtil from './jwt.util';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -80,8 +81,8 @@ describe('AuthService', () => {
       } as User);
 
       // Mock the signRSA function since we can't import it directly in the test
-      jest.spyOn(require('./jwt.util'), 'signRSA').mockReturnValue('mocked_rsa_token');
-      
+      jest.spyOn(jwtUtil, 'signRSA').mockReturnValue('mocked_rsa_token');
+
       // Mock the password service to return a predictable hash
       jest.spyOn(passwordService, 'hashPassword').mockResolvedValue('hashed_password123');
 
@@ -123,8 +124,7 @@ describe('AuthService', () => {
       jest.spyOn(repository, 'findOne').mockResolvedValue(user);
 
       // Mock the signRSA function since we can't import it directly in the test
-      const originalSignRSA = jest.requireActual('./jwt.util').signRSA;
-      jest.spyOn(require('./jwt.util'), 'signRSA').mockReturnValue('mocked_rsa_token');
+      jest.spyOn(jwtUtil, 'signRSA').mockReturnValue('mocked_rsa_token');
 
       const result = await service.login(loginDto);
 

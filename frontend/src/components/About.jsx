@@ -1,12 +1,10 @@
-import React from 'react'
-
 const About = () => {
   return (
     <div className="about-page">
       <h1>About Infrastructure Kata</h1>
       <p>
-        Infrastructure Kata is a project designed to help developers learn and practice 
-        infrastructure concepts through hands-on exercises. This React frontend provides 
+        Infrastructure Kata is a project designed to help developers learn and practice
+        infrastructure concepts through hands-on exercises. This React frontend provides
         a user interface to interact with the backend services.
       </p>
       <p>
