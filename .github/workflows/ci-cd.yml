@@ -18,8 +18,15 @@ jobs:
       with:
         node-version: '23'
 
-    - name: Install jq
-      run: sudo apt-get install -y jq
+    - name: Check for jq
+      run: |
+        if ! command -v jq &> /dev/null; then
+          echo "Error: jq is not installed on this self-hosted runner."
+          echo "Please install jq on your runner: sudo apt-get install jq"
+          exit 1
+        else
+          echo "jq is available: $(jq --version)"
+        fi
         
     - name: Set project list
       run: |
