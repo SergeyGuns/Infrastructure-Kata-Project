@@ -18,21 +18,38 @@ jobs:
       with:
         node-version: '20'
         
+    - name: Set project list
+      run: |
+        echo "PROJECTS=(backend auth-service frontend swagger-service migration-service)" >> $GITHUB_ENV
+
     - name: Install dependencies
       run: |
-        cd backend && npm ci && cd ..
-        cd auth-service && npm ci && cd ..
-        
+        for dir in ${PROJECTS[@]}; do
+          if [ -d "$dir" ] && [ -f "$dir/package.json" ]; then
+            echo "Installing deps for $dir"
+            if [ -f "$dir/package-lock.json" ]; then
+              npm ci --prefix "$dir"
+            else
+              npm install --prefix "$dir"
+            fi
+          fi
+        done
+
     - name: Run linting
       run: |
-        cd backend && npm run lint && cd ..
-        cd auth-service && npm run lint && cd ..
-        
+        for dir in ${PROJECTS[@]}; do
+          if [ -f "$dir/package.json" ]; then
+            npm run lint --prefix "$dir"
+          fi
+        done
+
     - name: Run tests
       run: |
-        cd backend && npm run test && cd ..
-        cd auth-service && npm run test && cd ..
-        
+        for dir in ${PROJECTS[@]}; do
+          if [ -f "$dir/package.json" ]; then
+            npm run test --prefix "$dir"
+          fi
+        done
     - name: Build Docker images
       run: |
         docker-compose -f docker-compose.test.yml build
