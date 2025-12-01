@@ -18,6 +18,25 @@ jobs:
       with:
         node-version: '23'
 
+    - name: Verify Node.js and npm installation
+      run: |
+        echo "Checking if Node.js is installed..."
+        if ! command -v node &> /dev/null; then
+          echo "Error: Node.js is not installed on this self-hosted runner."
+          exit 1
+        else
+          echo "Node.js is available: $(node --version)"
+        fi
+
+        echo "Checking if npm is installed..."
+        if ! command -v npm &> /dev/null; then
+          echo "Error: npm is not installed on this self-hosted runner."
+          echo "Please install Node.js with npm on your runner."
+          exit 1
+        else
+          echo "npm is available: $(npm --version)"
+        fi
+
     - name: Check for jq
       run: |
         if ! command -v jq &> /dev/null; then
