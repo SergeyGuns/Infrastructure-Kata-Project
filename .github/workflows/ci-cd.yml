@@ -92,6 +92,8 @@ jobs:
             if [ -d "$dir/node_modules/.bin" ]; then
               echo "Setting executable permissions for $dir/node_modules/.bin"
               chmod -R 755 "$dir/node_modules/.bin" 2>/dev/null || true
+              # Additionally, explicitly set executable permissions for all files
+              find "$dir/node_modules/.bin" -type f -exec chmod 755 {} \; 2>/dev/null || true
             fi
           fi
         done
@@ -102,6 +104,8 @@ jobs:
           if [ -d "$dir/node_modules/.bin" ]; then
             echo "Ensuring executable permissions in $dir/node_modules/.bin"
             chmod -R 755 "$dir/node_modules/.bin" 2>/dev/null || true
+            # Additionally, explicitly set executable permissions for all files
+            find "$dir/node_modules/.bin" -type f -exec chmod 755 {} \; 2>/dev/null || true
           fi
         done
 
@@ -119,6 +123,8 @@ jobs:
           if [ -d "$dir/node_modules/.bin" ]; then
             echo "Ensuring executable permissions in $dir/node_modules/.bin before tests"
             chmod -R 755 "$dir/node_modules/.bin" 2>/dev/null || true
+            # Additionally, explicitly set executable permissions for all files
+            find "$dir/node_modules/.bin" -type f -exec chmod 755 {} \; 2>/dev/null || true
           fi
         done
 
