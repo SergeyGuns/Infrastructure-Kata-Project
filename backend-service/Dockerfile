@@ -1,6 +1,6 @@
 # Multi-stage build for NestJS app
 # Stage 1: Build
-FROM node:22-alpine AS builder
+FROM node:23-alpine AS builder
 
 WORKDIR /app
 
@@ -19,12 +19,12 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Expose port 
+# Expose port
 EXPOSE 4000
 
 ###############################################
 # Stage 2: Runtime
-FROM node:22-alpine AS runtime
+FROM node:23-alpine AS runtime
 
 WORKDIR /app
 
@@ -38,7 +38,7 @@ RUN npm install --only=production --legacy-peer-deps
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
 
-# Expose port 
+# Expose port
 EXPOSE 4000
 
 # Start the application

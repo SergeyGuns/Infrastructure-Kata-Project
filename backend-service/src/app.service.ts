@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
-interface HealthResponse {
+export interface HealthResponse {
   status: string;
   timestamp: string;
   service: string;
 }
 
-interface HelloResponse {
+export interface HelloResponse {
   message: string;
   timestamp: string;
   environment: string;

@@ -13,6 +13,7 @@ import * as jwtUtil from './jwt.util';
 describe('AuthService', () => {
   let service: AuthService;
   let repository: Repository<User>;
+  let rsaService: RsaService;
   let passwordService: PasswordService;
 
   beforeEach(async () => {

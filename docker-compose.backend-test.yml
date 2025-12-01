@@ -1,9 +1,9 @@
 version: '3.8'
 services:
   backend-test:
-    build: ./backend
+    build: ./backend-service
     volumes:
-      - ./backend:/app
+      - ./backend-service:/app
       - /app/node_modules
     environment:
       - DB_HOST=postgres-test

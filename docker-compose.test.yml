@@ -58,7 +58,7 @@ services:
 
   # Integration tests container
   tests:
-    image: node:18-alpine
+    image: node:23-alpine
     volumes:
       - .:/app
     working_dir: /app
