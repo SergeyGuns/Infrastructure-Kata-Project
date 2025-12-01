@@ -24,7 +24,7 @@ project/
 ├── nginx/             # Configurations for static assets and load balancing
 ├── postgres/          # SQL migrations, dumps, backup scripts
 ├── docker/            # Dockerfiles for each service
-├── scripts/           # Backup and deployment scripts
+├── scripts/           # Backup, deployment, and linting scripts
 ├── k6/                # Load testing scripts
 ├── .github/workflows/ # GitHub Actions (linting, tests, build, deploy)
 └── .env.*             # Environment variables (dev, test, prod)
@@ -129,6 +129,7 @@ k6 run k6/basic-test.js
 3. **Monitoring**: The setup includes basic health checks and logging
 4. **Backups**: PostgreSQL backup script is included with automatic cleanup
 5. **Load Testing**: Basic k6 tests are provided as a starting point
+6. **Linting**: A script is available to run lint checks across all projects (run-lint-all.sh/run-lint-all.bat)
 
 ## Extending the Project
 

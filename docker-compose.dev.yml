@@ -42,18 +42,6 @@ services:
       - migration-service
     command: npx @nestjs/cli start --watch
 
-  swagger:
-    build: 
-      context: ./swagger-service
-      target: builder
-    volumes:
-      - ./swagger-service:/app
-    environment:
-      - PORT=3002
-    ports:
-      - "3002:3002"
-    command: npx @nestjs/cli start --watch
-
   postgres:
     image: postgres:15
     volumes:

@@ -14,7 +14,7 @@ This project demonstrates a complete infrastructure setup for a web application 
 ```
 project/
 ├── frontend/          # React
-├── backend/           # NestJS (микросервис)
+├── backend-service/   # NestJS (микросервис)
 ├── auth-service/      # Самописный сервер авторизации (NestJS + JWT)
 ├── nginx/             # Конфигурации для статики и балансировки
 ├── postgres/          # SQL-миграции, дампы, резервное копирование
@@ -29,6 +29,12 @@ project/
 1. Clone the repository
 2. Set up environment variables
 3. Run `docker-compose -f docker-compose.dev.yml up --build` for development
+
+## Linting
+
+To run lint checks across all projects, use the provided script:
+- On Unix systems: `./scripts/run-lint-all.sh`
+- On Windows: `scripts\run-lint-all.bat`
 
 ## Phases
 
