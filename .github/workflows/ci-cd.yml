@@ -51,7 +51,8 @@ jobs:
         for dir in ${PROJECTS[@]}; do
           if [ -f "$dir/package.json" ]; then
             # Check if test script exists in package.json
-            if jq -r '.scripts.test' "$dir/package.json" | grep -q .; then
+            TEST_SCRIPT=$(jq -r '.scripts.test' "$dir/package.json" 2>/dev/null)
+            if [ "$TEST_SCRIPT" != "null" ] && [ -n "$TEST_SCRIPT" ]; then
               echo "Running tests for $dir"
               npm run test --prefix "$dir"
             else
