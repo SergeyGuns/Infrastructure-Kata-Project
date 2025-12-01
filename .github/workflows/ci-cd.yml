@@ -20,7 +20,7 @@ jobs:
         
     - name: Set project list
       run: |
-        echo "PROJECTS=(backend auth-service frontend migration-service)" >> $GITHUB_ENV
+        echo "PROJECTS=(backend-service auth-service frontend migration-service)" >> $GITHUB_ENV
 
     - name: Install dependencies
       run: |

@@ -11,7 +11,6 @@ services_with_lint=(
   "backend-service"
   "auth-service" 
   "migration-service"
-  "swagger-service"
 )
 
 # Root directory of the project
