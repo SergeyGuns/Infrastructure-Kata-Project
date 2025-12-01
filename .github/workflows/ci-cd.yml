@@ -17,6 +17,9 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '23'
+
+    - name: Install jq
+      run: sudo apt-get install -y jq
         
     - name: Set project list
       run: |
@@ -47,7 +50,13 @@ jobs:
       run: |
         for dir in ${PROJECTS[@]}; do
           if [ -f "$dir/package.json" ]; then
-            npm run test --prefix "$dir"
+            # Check if test script exists in package.json
+            if jq -r '.scripts.test' "$dir/package.json" | grep -q .; then
+              echo "Running tests for $dir"
+              npm run test --prefix "$dir"
+            else
+              echo "No test script found in $dir/package.json, skipping tests"
+            fi
           fi
         done
     - name: Build Docker images
