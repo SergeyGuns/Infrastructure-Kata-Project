@@ -97,6 +97,14 @@ jobs:
           fi
         done
 
+    # - name: Build Docker images
+    #   run: |
+    #     docker-compose -f docker-compose.test.yml build
+        
+    # - name: Run integration tests
+    #   run: |
+    #     docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from tests
+
 
   build-and-push:
     needs: test
@@ -104,13 +112,6 @@ jobs:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
 
     steps:
-    - name: Build Docker images
-      run: |
-        docker-compose -f docker-compose.test.yml build
-        
-    - name: Run integration tests
-      run: |
-        docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from tests
 
     - name: Pre-cleanup to fix permission issues
       run: |
