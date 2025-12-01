@@ -87,6 +87,21 @@ jobs:
             echo "Fixing permissions for $dir/node_modules"
             find "$dir/node_modules" -type d -exec chmod 755 {} \; 2>/dev/null || true
             find "$dir/node_modules" -type f -exec chmod 644 {} \; 2>/dev/null || true
+
+            # Ensure executable permissions for files in .bin directory
+            if [ -d "$dir/node_modules/.bin" ]; then
+              echo "Setting executable permissions for $dir/node_modules/.bin"
+              chmod -R 755 "$dir/node_modules/.bin" 2>/dev/null || true
+            fi
+          fi
+        done
+
+    - name: Ensure executable permissions before running scripts
+      run: |
+        for dir in ${PROJECTS[@]}; do
+          if [ -d "$dir/node_modules/.bin" ]; then
+            echo "Ensuring executable permissions in $dir/node_modules/.bin"
+            chmod -R 755 "$dir/node_modules/.bin" 2>/dev/null || true
           fi
         done
 
@@ -95,6 +110,15 @@ jobs:
         for dir in ${PROJECTS[@]}; do
           if [ -f "$dir/package.json" ]; then
             npm run lint --prefix "$dir"
+          fi
+        done
+
+    - name: Ensure executable permissions before running tests
+      run: |
+        for dir in ${PROJECTS[@]}; do
+          if [ -d "$dir/node_modules/.bin" ]; then
+            echo "Ensuring executable permissions in $dir/node_modules/.bin before tests"
+            chmod -R 755 "$dir/node_modules/.bin" 2>/dev/null || true
           fi
         done
 
