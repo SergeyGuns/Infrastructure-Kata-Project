@@ -3,3 +3,4 @@
 *.next
 .vscode
 *.log
+/backend-service/coverage
