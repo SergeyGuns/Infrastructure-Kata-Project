@@ -11,6 +11,19 @@ jobs:
     runs-on: self-hosted
 
     steps:
+    - name: Pre-cleanup to fix permission issues
+      run: |
+        # Fix permissions for node_modules directories before checkout
+        chmod -R 755 ./backend-service/node_modules 2>/dev/null || true
+        chmod -R 755 ./auth-service/node_modules 2>/dev/null || true
+        chmod -R 755 ./frontend/node_modules 2>/dev/null || true
+        chmod -R 755 ./migration-service/node_modules 2>/dev/null || true
+        # Also fix .bin directories specifically
+        chmod -R 755 ./backend-service/node_modules/.bin 2>/dev/null || true
+        chmod -R 755 ./auth-service/node_modules/.bin 2>/dev/null || true
+        chmod -R 755 ./frontend/node_modules/.bin 2>/dev/null || true
+        chmod -R 755 ./migration-service/node_modules/.bin 2>/dev/null || true
+
     - uses: actions/checkout@v4
 
     - name: Setup Node.js
