@@ -9,10 +9,10 @@ on:
 jobs:
   test:
     runs-on: self-hosted
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
@@ -27,10 +27,25 @@ jobs:
         else
           echo "jq is available: $(jq --version)"
         fi
-        
+
     - name: Set project list
       run: |
         echo "PROJECTS=(backend-service auth-service frontend migration-service)" >> $GITHUB_ENV
+
+    - name: Ensure proper permissions for node_modules cleanup
+      run: |
+        # Create a script to ensure proper cleanup of node_modules
+        cat > cleanup-node-modules.sh << 'EOF'
+        #!/bin/bash
+        for dir in ${PROJECTS[@]}; do
+          if [ -d "$dir/node_modules" ]; then
+            echo "Setting permissions for $dir/node_modules"
+            sudo chown -R $(whoami):$(whoami) "$dir/node_modules" 2>/dev/null || true
+            chmod -R 755 "$dir/node_modules" 2>/dev/null || true
+          fi
+        done
+        EOF
+        chmod +x cleanup-node-modules.sh
 
     - name: Install dependencies
       run: |
@@ -42,6 +57,17 @@ jobs:
             else
               npm install --prefix "$dir"
             fi
+          fi
+        done
+
+    - name: Post-installation permission fix
+      run: |
+        # Fix permissions after installation to prevent cleanup issues
+        for dir in ${PROJECTS[@]}; do
+          if [ -d "$dir/node_modules" ]; then
+            echo "Fixing permissions for $dir/node_modules"
+            find "$dir/node_modules" -type d -exec chmod 755 {} \; 2>/dev/null || true
+            find "$dir/node_modules" -type f -exec chmod 644 {} \; 2>/dev/null || true
           fi
         done
 
@@ -74,6 +100,17 @@ jobs:
     - name: Run integration tests
       run: |
         docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from tests
+
+    - name: Cleanup node_modules to prevent permission issues
+      if: always()  # This runs even if previous steps fail
+      run: |
+        for dir in ${PROJECTS[@]}; do
+          if [ -d "$dir/node_modules" ]; then
+            echo "Cleaning up $dir/node_modules"
+            chmod -R 755 "$dir/node_modules" 2>/dev/null || true
+            rm -rf "$dir/node_modules" 2>/dev/null || echo "Some files in $dir/node_modules could not be removed, which is OK"
+          fi
+        done
 
   build-and-push:
     needs: test
