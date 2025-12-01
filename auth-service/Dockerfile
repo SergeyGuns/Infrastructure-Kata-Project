@@ -10,8 +10,7 @@ COPY package*.json ./
 # Install dependencies and NestJS CLI globally
 RUN npm install --legacy-peer-deps && \
     npm ci --legacy-peer-deps && \
-    npm install -g @nestjs/cli && \
-    ln -s /usr/local/bin/nest /usr/bin/nest
+    npm install -g @nestjs/cli
 
 # Copy source code
 COPY . .
@@ -23,6 +22,25 @@ RUN npm run build
 EXPOSE 4000
 
 ###############################################
+# Stage 2: Development
+FROM node:23-alpine AS development
+
+WORKDIR /app
+
+COPY package*.json ./
+
+# Install all dependencies (including dev dependencies) to have nest CLI available for development
+RUN npm ci --legacy-peer-deps
+
+# Copy source code
+COPY . .
+
+EXPOSE 4001
+
+CMD ["npm", "run", "start:dev"]
+
+###############################################
+# Stage 3: Runtime
 FROM node:23-alpine AS runtime
 
 WORKDIR /app

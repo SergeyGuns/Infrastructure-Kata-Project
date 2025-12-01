@@ -4,9 +4,12 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install && \
-    npm ci
+# Install all dependencies to have typeorm CLI available
+RUN npm ci
 
 COPY . .
 
-CMD ["npm", "run", "start"]
+# Build the TypeScript files before running migrations
+RUN npm run build
+
+CMD ["npm", "run", "migration:run"]

@@ -9,7 +9,9 @@ services:
     command: npm run dev
 
   backend:
-    build: ./backend-service
+    build:
+      context: ./backend-service
+      target: development  # Use the development stage which has all dependencies
     volumes:
       - ./backend-service:/app
       - /app/node_modules
@@ -25,7 +27,12 @@ services:
     command: npm run start:dev
 
   auth:
-    build: ./auth-service
+    build:
+      context: ./auth-service
+      target: development  # Use the development stage which has all dependencies
+    volumes:
+      - ./auth-service:/app
+      - /app/node_modules
     environment:
       - JWT_SECRET=test_secret
       - DB_HOST=postgres
