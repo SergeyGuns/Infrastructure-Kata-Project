@@ -12,7 +12,6 @@ import { ConfigService } from '@nestjs/config';
 describe('AuthService', () => {
   let service: AuthService;
   let repository: Repository<User>;
-  let rsaService: RsaService;
   let passwordService: PasswordService;
 
   beforeEach(async () => {
@@ -81,7 +80,6 @@ describe('AuthService', () => {
       } as User);
 
       // Mock the signRSA function since we can't import it directly in the test
-      const originalSignRSA = jest.requireActual('./jwt.util').signRSA;
       jest.spyOn(require('./jwt.util'), 'signRSA').mockReturnValue('mocked_rsa_token');
       
       // Mock the password service to return a predictable hash

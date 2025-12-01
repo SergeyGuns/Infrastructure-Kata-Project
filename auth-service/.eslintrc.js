@@ -6,6 +6,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended'
   ],
   parserOptions: {
+    ignorePatterns: ['*.spec.ts'],
     ecmaVersion: 2020,
     sourceType: 'module',
     project: './tsconfig.json',

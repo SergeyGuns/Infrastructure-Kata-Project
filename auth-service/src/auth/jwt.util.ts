@@ -1,6 +1,6 @@
 import * as crypto from 'crypto';
 
-export function signRSA(payload: any, privateKey: string, options: { expiresIn?: string | number } = {}): string {
+export function signRSA(payload: {id: string}, privateKey: string, options: { expiresIn?: string | number } = {}): string {
   // Create the header with the algorithm
   const header = {
     alg: 'RS256',
